@@ -1,10 +1,10 @@
 # Agentic session log
 
-The stored log of one agent run. 
+The stored log of a single agent run. 
 
-Evidence statements point at it by **uri + digest**.
+Agnetic process evidence statements point at the session logs by **uri + digest**.
 
-Search by the subject the run produced (commit, PR, version), and by tools, agent, and suspected policy issues. 
+May be queried by the subject that run produced (commit, PR, version), and by tools, agent, and suspected policy issues. 
 
 Some products must keep logs at least 6 months (EU AI Act, Article 19).
 
@@ -69,42 +69,57 @@ The overlay is `eventId`, `event`, `ts`. Other properties keep the producer’s 
 
 ## Log object
 
-| Field | Type | Required | Constraints | Description |
-|---|---|---|---|---|
-| `sessionId` | String | yes | non-empty | Session id. Process evidence `sessionsLogs` points here. |
-| `parentSessionId` | String | no | non-empty when present | Parent session |
-| `affectedEntities` | Object array | no | subject keys, such as `gitCommit` | Entities this run produced or handled |
-| `provider` | Provider | yes | see [Provider](../agentic-process-evidence/agent-identifier.md) | Harness, agent, and the models used |
-| `timeline` | TimelineEvent array | yes | ≥1; see [Timeline event](#timeline-event) | Ordered hook events |
+
+| Field              | Type                | Required | Constraints                                                     | Description                                              |
+| ------------------ | ------------------- | -------- | --------------------------------------------------------------- | -------------------------------------------------------- |
+| `sessionId`        | String              | yes      | non-empty                                                       | Session id. Process evidence `sessionsLogs` points here. |
+| `parentSessionId`  | String              | no       | non-empty when present                                          | Parent session                                           |
+| `affectedEntities` | Object array        | no       | subject keys, such as `gitCommit`                               | Entities this run produced or handled                    |
+| `provider`         | Provider            | yes      | see [Provider](../agentic-process-evidence/agent-identifier.md) | Harness, agent, and the models used                      |
+| `timeline`         | TimelineEvent array | yes      | ≥1; see [Timeline event](#timeline-event)                       | Ordered hook events                                      |
+
+
+
 
 ## Timeline event
 
 Harness event plus the overlay. Extra producer properties MAY appear and MUST NOT be renamed. Do not copy `sessionId` onto the event.
 
-| Field | Type | Required | Constraints | Description |
-|---|---|---|---|---|
-| `eventId` | String | yes | unique within the log | Dedup and citation |
-| `event` | String | yes | SHOULD be a [kind](#timeline-event-kind) when one applies | Event kind |
-| `ts` | Timestamp | yes | ISO 8601 | Event time |
+
+| Field     | Type      | Required | Constraints                                               | Description        |
+| --------- | --------- | -------- | --------------------------------------------------------- | ------------------ |
+| `eventId` | String    | yes      | unique within the log                                     | Dedup and citation |
+| `event`   | String    | yes      | SHOULD be a [kind](#timeline-event-kind) when one applies | Event kind         |
+| `ts`      | Timestamp | yes      | ISO 8601                                                  | Event time         |
+
+
+
 
 ## Timeline event kind
 
 Use one of these when it fits. Other values MAY be used for harness events with no equivalent. `hook_event_name` MAY repeat the native name.
 
-| Value | Meaning |
-|---|---|
+
+| Value                | Meaning                      |
+| -------------------- | ---------------------------- |
 | `beforeSubmitPrompt` | Prompt about to be submitted |
-| `preToolUse` | Tool invocation about to run |
-| `postToolUse` | Tool invocation finished |
-| `afterAgentResponse` | Agent produced a response |
-| `sessionEnd` | Session finished; flush |
+| `preToolUse`         | Tool invocation about to run |
+| `postToolUse`        | Tool invocation finished     |
+| `afterAgentResponse` | Agent produced a response    |
+| `sessionEnd`         | Session finished; flush      |
+
+
+
 
 ## Searchable attributes
 
-| Property | Type | Required | Constraints | Description |
-|---|---|---|---|---|
-| `tools` | Tool array | no | 0..*; see [Tool](../agentic-process-evidence/agentic-process-evidence.md#tool) | Tools used |
-| `agent` | Agent | no | `provider.agent`; see [Agent](../agentic-process-evidence/agent-identifier.md#agent) | Agent metadata |
-| `subject` | Object | no | subject keys | Commit or other subject |
-| `sessionId` | String | yes | same as the log `sessionId` | Session id |
-| `parentSessionId` | String | no | | Parent session |
+
+| Property          | Type       | Required | Constraints                                                                          | Description             |
+| ----------------- | ---------- | -------- | ------------------------------------------------------------------------------------ | ----------------------- |
+| `tools`           | Tool array | no       | 0..*; see [Tool](../agentic-process-evidence/agentic-process-evidence.md#tool)       | Tools used              |
+| `agent`           | Agent      | no       | `provider.agent`; see [Agent](../agentic-process-evidence/agent-identifier.md#agent) | Agent metadata          |
+| `subject`         | Object     | no       | subject keys                                                                         | Commit or other subject |
+| `sessionId`       | String     | yes      | same as the log `sessionId`                                                          | Session id              |
+| `parentSessionId` | String     | no       |                                                                                      | Parent session          |
+
+
